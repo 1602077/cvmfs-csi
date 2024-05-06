@@ -1,5 +1,13 @@
 name: ci-test-golang
-on: [push]
+on: 
+  push:
+    branches:
+      - '*'
+      - '!master'
+  pull_request:
+    branches:
+      - 'master'
+  workflow_dispatch:
 
 jobs:
   test:
@@ -29,4 +37,3 @@ jobs:
         with:
           name: go-results-${{ matrix.go-version }}
           path: test-results-${{ matrix.go-version }}.json
-
