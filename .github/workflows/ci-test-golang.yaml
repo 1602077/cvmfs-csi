@@ -1,0 +1,32 @@
+name: ci-test-golang
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [ '1.21', '1.22' ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run go vet
+        run: go vet ./...
+
+      - name: Run go test
+        run: go test ./... -json > test-results-${{ matrix.go-version }}.json
+
+      - name: Publish test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-results-${{ matrix.go-version }}
+          path: test-results-${{ matrix.go-version }}.json
+
