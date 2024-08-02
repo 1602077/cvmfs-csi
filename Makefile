@@ -18,7 +18,7 @@
 
 BINDIR           := $(CURDIR)/bin
 DIST_DIRS        := find * -type d -exec
-TARGETS          ?= linux/amd64 linux/arm64
+TARGETS          ?= linux/amd64
 IMAGE_BUILD_TOOL ?= podman
 GOX_PARALLEL     ?= 3
 
@@ -66,6 +66,7 @@ IMAGE_TAG := ${GIT_BRANCH}
 ifneq ($(GIT_TAG),)
     IMAGE_TAG = ${GIT_TAG}
 endif
+IMAGE_TAG := "v2.4.1"
 
 ARCH := $(shell uname -m)
 ifeq ($(ARCH),x86_64)
@@ -73,6 +74,7 @@ ifeq ($(ARCH),x86_64)
 else ifeq ($(ARCH),arm64)
     LOCAL_TARGET=linux/arm64
 endif
+LOCAL_TARGET=linux/amd64
 
 .PHONY: all
 all: build
@@ -111,7 +113,8 @@ image: build
 		--build-arg RELEASE=$(IMAGE_TAG)                           \
 		--build-arg GITREF=$(GIT_COMMIT)                           \
 		--build-arg CREATED=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ") \
-		-t registry.cern.ch/kubernetes/cvmfs-csi:$(IMAGE_TAG)      \
+		--platform linux/amd64 \
+		-t registry.cern.ch/jcmunday/cvmfs-csi:$(IMAGE_TAG)      \
 		-f ./deployments/docker/Dockerfile .
 
 # ------------------------------------------------------------------------------
